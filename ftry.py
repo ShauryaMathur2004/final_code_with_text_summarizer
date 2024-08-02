@@ -10,7 +10,7 @@ import os
 from PIL import Image
 import pytesseract as pyt
 pyt.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-import fitz  # PyMuPDF
+import fitz  
 from time import sleep
 from transformers import pipeline, logging as transformers_logging
 
@@ -46,9 +46,9 @@ st.markdown("""
         width: 100%;
         white-space: nowrap;
         overflow: hidden;
-        border-right: 0.15em solid orange;
+        border-right: 0.15em solid black;
         animation:
-            typing 3.5s steps(40, end),
+            typing 2s steps(40, end),  /* Reduced duration from 3s to 2s */
             blink-caret 0.75s step-end infinite;
         display: block;
     }
@@ -60,7 +60,7 @@ st.markdown("""
 
     @keyframes blink-caret {
         from, to { border-color: transparent; }
-        50% { border-color: orange; }
+        50% { border-color: black; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -76,7 +76,7 @@ with st.sidebar:
     selected = option_menu(
         menu_title="Main Menu",
         options=["Home", "Optical Character Recognition", "Text Summarizer"],
-        icons=["house", "cloud-upload", "book"],
+        icons=["house", "camera", "book"], 
         default_index=0,
     )
     st.session_state.selected = selected
@@ -286,3 +286,16 @@ if st.session_state.selected == "Text Summarizer":
                     st.write(text)
                     st.write("Summary:")
                     st.write(summary)
+                    
+                    pdf_dir = "pdf_files"
+                    os.makedirs(pdf_dir, exist_ok=True)
+                    summary_file_name = os.path.join(pdf_dir, "summary.pdf")
+                    
+                    create_pdf(summary, summary_file_name)
+                    with open(summary_file_name, "rb") as f:
+                        st.download_button(
+                            label="Download Summary PDF",
+                            data=f,
+                            file_name="summary.pdf",
+                            mime="application/pdf"
+                        )
